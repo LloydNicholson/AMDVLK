@@ -408,6 +408,19 @@ static void setGfx1201Info(TargetInfo *targetInfo) {
 
 #endif
 
+#if LLPC_BUILD_NAVI44
+// gfx1200
+//
+// @param [in/out] targetInfo : Target info
+static void setGfx1200Info(TargetInfo *targetInfo) {
+  setGfx12Info(targetInfo);
+
+  targetInfo->getGpuProperty().numShaderEngines = 2;
+  targetInfo->getGpuProperty().numComputeUnitsPerShaderEngine = 16;
+
+}
+#endif
+
 // Represents device infos.
 struct GpuNameStringMap {
   const char *gpuName;
@@ -437,6 +450,9 @@ static const GpuNameStringMap GpuNameMap[] = {
 #if LLPC_BUILD_STRIX_HALO
     {"gfx1151", "Strix_halo", &setGfx1151Info}, // gfx1151
 #endif
+#if LLPC_BUILD_NAVI44
+    {"gfx1200", "Navi44", &setGfx1200Info}, // gfx1200
+#endif
 #if LLPC_BUILD_NAVI48
     {"gfx1201", "Navi48", &setGfx1201Info}, // gfx1201
 #endif
@@ -447,7 +463,7 @@ static const GpuNameStringMap GpuNameMap[] = {
 //
 // @param gpuName : LLVM GPU name, e.g. "gfx900"
 bool TargetInfo::setTargetInfo(StringRef gpuName) {
-  void (*setTargetInfoFunc)(TargetInfo * targetInfo) = nullptr;
+  void (*setTargetInfoFunc)(TargetInfo *targetInfo) = nullptr;
   for (const GpuNameStringMap &mapEntry : ArrayRef<GpuNameStringMap>(GpuNameMap)) {
     if (gpuName == mapEntry.gpuName) {
       setTargetInfoFunc = mapEntry.setTargetInfoFunc;
